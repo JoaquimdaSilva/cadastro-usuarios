@@ -5,15 +5,8 @@ import com.joaquimventura.cadastrousuarios.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -30,7 +23,16 @@ public class UsuarioController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Usuario criarOuAtualizar(@RequestBody Usuario u) {
-        return repository.save(u);
+        if(u.getId() != null && u.getId() > 0){
+            Usuario old = repository.findById(u.getId()).orElse(null);
+            old.setNome(u.getNome());
+            old.setDataNascimento(u.getDataNascimento());
+            old.setAvatar(u.getAvatar());
+            return repository.save(old);
+        }else{
+            return repository.save(u);
+        }
+
     }
 
 
